@@ -1,7 +1,7 @@
 # Costs, Materials, and Production Module
 
 **Date:** 2026-10-09  
-**Status:** Design approved in chat; awaiting written spec review  
+**Status:** Revised design approved in chat; awaiting written spec review  
 **Target:** Native Expo Android app in `Documents/HORMACHUELOS/inventory-pos-app`
 
 ## Purpose
@@ -13,12 +13,17 @@ The browser POS under `web/` is outside this change.
 ## Approved decisions
 
 - Track both recipe-based production materials and shop supplies.
-- Staff record production batches; confirming a batch consumes ingredients and adds finished quantity to product stock.
+- Authenticate owners and staff with Supabase email/password sign-in and resolve permissions from profiles.role rather than the demo role picker. Persist the session securely and cache the last authenticated role for local offline use after an initial successful sign-in.
+- The owner records production batches; confirming a batch consumes ingredients and adds finished quantity to product stock.
 - Use weighted-average cost for materials.
 - Keep expenses and movements usable offline in SQLite, then sync idempotently to Supabase.
 - Add the owner-only Costs entry under the existing More tab.
 - Report cash outflow separately from expenses recognized in profit.
 - V1 excludes payroll, tax filing, supplier credit balances, and formal double-entry accounting.
+
+## Authentication and access
+
+The native app signs in with Supabase email and password; v1 does not provide public account registration. Each account must have a matching `profiles` row with an owner or staff role. The first sign-in requires network access. Persist the session with Expo SecureStore and cache the last authenticated role there so that returning users can keep using local data offline; the cache grants no ability to synchronize without a valid Supabase session. Sign-out clears the cached role and session. Do not store passwords.
 
 ## Workflow
 
@@ -68,7 +73,7 @@ Inventory purchases are excluded from recognized expenses. Material consumed as 
 - **Waste:** material or finished product, quantity, reason, and date.
 - **Dashboard:** show estimated net profit and its components without replacing existing sales metrics.
 
-Costs and inventory actions are owner-only, matching the existing role model. Staff retain POS-only access.
+Costs and inventory actions are owner-only, using the authenticated Supabase profile role. Staff retain POS-only access. A cached role is only for offline gating; Supabase row-level security remains authoritative online.
 
 ## Data and architecture
 
@@ -85,13 +90,13 @@ Amounts are integer centavos, matching current SQLite conventions. Quantity is s
 
 ### Offline sync
 
-SQLite is the local write path. New immutable records enter an outbox and are pushed with stable IDs so retrying a request cannot duplicate a movement or expense. Supabase uses matching tables, owner-only row-level security, and transactional RPCs for multi-row operations such as material receipt and production batch completion. Failed sync retains pending local records. A server-side stock conflict is surfaced for owner reconciliation; it is never silently overwritten.
+SQLite is the local write path. At startup, restore the persisted Supabase session and cached profile role; permit local offline work only for a previously authenticated user. New immutable records enter an outbox and are pushed with stable IDs so retrying a request cannot duplicate a movement or expense. Synchronization requires a valid Supabase session. Supabase uses matching tables, owner-only row-level security, and transactional RPCs for multi-row operations such as material receipt and production batch completion. Failed sync retains pending local records. A server-side stock conflict is surfaced for owner reconciliation; it is never silently overwritten.
 
 Before adding these payloads, align the native sync adapter with the current Supabase schema. The checked-in Expo database and sync code use older integer IDs/field names than the Supabase schema, so sync compatibility is a prerequisite phase, not an assumption.
 
 ## Delivery phases
 
-1. **Data/sync foundation:** document and reconcile native vs. Supabase identifiers and fields, add versioned SQLite and Supabase migrations, and establish idempotent owner-only outbox/RPC patterns.
+1. **Auth/data/sync foundation:** add Supabase email/password sign-in, secure session persistence, and profile-role lookup; reconcile native vs. Supabase identifiers and fields; add versioned SQLite and Supabase migrations; establish idempotent owner-only outbox/RPC patterns.
 2. **Expenses and material stock:** direct expenses, paid receipts, weighted-average material stock, supply use, and waste movements.
 3. **Recipes and production:** recipe management, batch recording, atomic stock transfer, and sale-time product-cost snapshots.
 4. **Reports:** period/category filters and net-profit calculation from sales, expenses, supply use, and waste.
@@ -101,6 +106,7 @@ Each phase must preserve existing offline checkout and avoid changing the browse
 ## Risks and safeguards
 
 - **Existing native/cloud schema drift:** reconcile before turning on new sync; test against a disposable Supabase project or local Supabase instance before production migration.
+- **Authentication migration:** the app currently has a demo role picker. Owner/staff accounts and matching Supabase profile rows must exist before cross-device sync is enabled; a previously signed-in user can continue locally offline, but cannot synchronize without a valid session.
 - **Concurrent offline production:** server RPC validates stock and idempotency. Conflicts remain queued with a clear reconciliation path rather than producing negative stock.
 - **Cost history changes:** movements, batches, and sale items retain unit-cost snapshots. Recipe or cost edits affect future transactions only.
 - **Double counting purchases:** reports separate cash outflow from recognized expenses; inventory purchase totals are not added directly to net-profit expenses.
@@ -115,5 +121,6 @@ Each phase must preserve existing offline checkout and avoid changing the browse
 - A production batch cannot partially apply; it deducts ingredients, adds finished stock, and snapshots cost together.
 - Sale COGS uses the product cost saved on each sale item and is not recalculated from today's material prices.
 - Reports distinguish cash spent, COGS, direct expenses, supply use, waste, and estimated net profit.
-- Staff cannot access Costs, recipes, or financial summaries.
+- Staff cannot access Costs, recipes, or financial summaries; permissions come from authenticated profiles, and sign-out clears the offline role cache.
+- A previously signed-in account can use local POS and Costs data offline; first sign-in requires internet, and queued records sync only after Supabase authentication is restored.
 - Existing POS sale/stock behavior remains intact; browser POS is unchanged.
