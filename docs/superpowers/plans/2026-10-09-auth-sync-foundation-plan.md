@@ -113,4 +113,3 @@
 - A sale reaches the canonical Supabase schema once; replaying the same queued sale does not duplicate a sale, item, or stock decrement.
 - Missing auth, profile, product mapping, or available stock produces a recoverable sync message and keeps the row pending.
 - Existing local-only POS checkout and the independent browser POS remain unchanged.
-
