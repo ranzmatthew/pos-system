@@ -1,0 +1,8 @@
+node_modules/
+.git/
+.env*
+web/
+docs/
+design-draft.html
+.agents/
+.codex/

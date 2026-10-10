@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory POS - Mobile Draft</title>
+<style>
+  body{font-family:system-ui,Arial,sans-serif;background:#111;margin:0;padding:24px;color:#fff}
+  h1{font-size:22px;margin:0 0 4px} p.sub{color:#bbb;margin:0 0 18px}
+  .grid{display:flex;gap:18px;flex-wrap:wrap}
+  .phone{width:300px;background:#F6F4EF;color:#141414;border-radius:34px;padding:12px;flex-shrink:0}
+  .screen{background:#F6F4EF;border-radius:24px;overflow:hidden;min-height:600px;display:flex;flex-direction:column}
+  .notch{height:26px;display:flex;justify-content:center;align-items:center;color:#999;font-size:12px}
+  .body{padding:12px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .card{background:#fff;border:1px solid #E8E1D3;border-radius:14px;padding:12px}
+  .btn{background:#141414;color:#fff;border-radius:10px;padding:12px;text-align:center;font-weight:800}
+  .ghost{border:1px solid #141414;border-radius:10px;padding:12px;text-align:center;font-weight:800}
+  .muted{color:#6E6A61;font-size:12px} .t{font-size:20px;font-weight:900}
+  .row{display:flex;justify-content:space-between;align-items:center}
+  .prod{background:#fff;border:1px solid #E8E1D3;border-radius:12px;padding:10px;flex:1}
+  .grid2{display:flex;gap:8px} .pill{font-size:11px;font-weight:800}
+  .green{color:#1E7E34} .red{color:#B3261E} .orange{color:#B25E00}
+  .bar-track{height:90px;background:#EFE9DA;border-radius:8px;display:flex;align-items:flex-end;overflow:hidden}
+  .bar{width:100%;background:#141414;border-radius:6px}
+  .week{display:flex;gap:6px} .week div{flex:1;text-align:center;font-size:11px;color:#6E6A61}
+  .tabs{display:flex;background:#fff;border-top:1px solid #E8E1D3}
+  .tabs div{flex:1;text-align:center;padding:10px 0;font-size:12px;font-weight:700;color:#999}
+  .tabs .on{color:#141414}
+  .cap{font-size:13px;color:#ddd;margin:8px 0 0}
+  input{width:100%;box-sizing:border-box;border:1px solid #E8E1D3;border-radius:10px;padding:10px}
+  .receipt{background:#fff;color:#111;font-family:monospace;font-size:12px;padding:12px;border-radius:8px}
+</style>
+</head>
+<body>
+<h1>Tindahan POS — mobile draft</h1>
+<p class="sub">Staff = POS only • Owner = all tabs • Offline-first, 58mm receipt</p>
+<div class="grid">
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div style="text-align:center;font-size:24px;font-weight:900">Tindahan POS</div>
+<div class="muted" style="text-align:center">Inventory + sales in one app</div>
+<div class="card"><b>Staff / Owner PIN</b><div style="height:8px"></div><input placeholder="e.g. 1234" /><div style="height:8px"></div><div class="btn">Enter as Owner</div><div style="height:8px"></div><div class="ghost">Enter as Staff (POS only)</div><div class="muted" style="text-align:center;margin-top:6px">Staff cannot see cost or profit.</div></div>
+</div><div class="tabs"><div>POS</div><div>Stock</div><div>Sales</div><div>More</div></div></div></div><p class="cap">1 — Login: pick role with PIN</p></div>
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div class="row"><b>Counter • Staff</b><span class="pill orange">2 waiting to send</span></div>
+<input placeholder="Search product..." />
+<div class="grid2"><div class="prod"><b>Coke 500ml</b><br><b>P35.00</b><br><span class="muted">Stock 24</span></div><div class="prod"><b>Pandesal</b><br><b>P5.00</b><br><span class="pill red">Only 3 left</span></div></div>
+<div class="grid2"><div class="prod"><b>Rice 1kg</b><br><b>P52.00</b><br><span class="muted">Stock 40</span></div><div class="prod"><b>Coffee</b><br><b>P15.00</b><br><span class="muted">Stock 18</span></div></div>
+<div class="card"><div class="row"><b>Cart • P75.00</b><span class="muted">3 items</span></div><div class="row"><span>Coke x2</span><b>P70.00</b></div><div class="row"><span>Pandesal x1</span><b>P5.00</b></div><div class="grid2"><input placeholder="Cash, e.g. 500" /><div class="btn" style="flex:1">Charge</div></div></div>
+</div><div class="tabs"><div class="on">POS</div><div>Stock</div><div>Sales</div><div>More</div></div></div></div><p class="cap">2 — POS: big tiles + cart sheet</p></div>
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div class="t">Stock</div><div class="muted">24 items • 3 low</div>
+<div class="card"><b>+ Add product</b><div style="height:8px"></div><input placeholder="Name, e.g. Coke 500ml" /><div style="height:6px"></div><div class="grid2"><input placeholder="Price" /><input placeholder="Cost" /></div><div style="height:6px"></div><input placeholder="Stock, e.g. 50" /><div style="height:6px"></div><div class="btn">Save product</div></div>
+<input placeholder="Search stock..." />
+<div class="card"><div class="row"><div><b>Coke 500ml</b><br><span class="muted">Sell P35 • Cost P25</span></div><div style="text-align:right"><b>24</b><br><span class="pill green">OK</span></div></div></div>
+<div class="card"><div class="row"><div><b>Pandesal</b><br><span class="muted">Sell P5 • Cost P3</span></div><div style="text-align:right"><b>3</b><br><span class="pill red">LOW</span></div></div></div>
+</div><div class="tabs"><div>POS</div><div class="on">Stock</div><div>Sales</div><div>More</div></div></div></div><p class="cap">3 — Stock: owner only, low flags</p></div>
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div class="t">Hello, Owner</div>
+<div class="grid2"><div class="card" style="flex:1"><div class="muted">Today sales</div><b>P4,250</b></div><div class="card" style="flex:1"><div class="muted">Profit</div><b class="green">P1,180</b></div></div>
+<div class="grid2"><div class="card" style="flex:1"><div class="muted">Receipts</div><b>38</b></div><div class="card" style="flex:1"><div class="muted">Status</div><b>Selling</b></div></div>
+<div class="card"><b>This week</b><div class="week"><div><div class="bar-track"><div class="bar" style="height:40%"></div></div>Mo</div><div><div class="bar-track"><div class="bar" style="height:65%"></div></div>Tu</div><div><div class="bar-track"><div class="bar" style="height:50%"></div></div>We</div><div><div class="bar-track"><div class="bar" style="height:90%"></div></div>Th</div><div><div class="bar-track"><div class="bar" style="height:70%"></div></div>Fr</div></div></div>
+<div class="card"><b>Restock soon</b><div class="row"><span>Pandesal</span><span class="pill red">3 left</span></div><div class="row"><span>Coffee sachet</span><span class="pill red">5 left</span></div></div>
+<div class="card"><b>Latest sales</b><div class="row"><span>Receipt #104</span><b>P75.00</b></div><div class="row"><span>Receipt #103</span><b>P120.00</b></div></div>
+</div><div class="tabs"><div>POS</div><div>Stock</div><div class="on">Sales</div><div>More</div></div></div></div><p class="cap">4 — Dashboard: profit + graph + restock</p></div>
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div class="t">Receipt • 58mm</div>
+<div class="receipt">TINDAHAN POS<br>----------------<br>Coke 500ml x2 70.00<br>Pandesal x1 5.00<br>----------------<br>TOTAL 75.00<br>CASH 100.00<br>CHANGE 25.00<br>Sale #104<br>Thank you!</div>
+<div class="btn">Print receipt</div><div class="ghost">Reprint last sale</div>
+<div class="card"><b>Printer</b><br><span class="muted">Pair in Android Bluetooth first.</span><br><span class="pill orange">● Not connected</span></div>
+</div><div class="tabs"><div class="on">POS</div><div>Stock</div><div>Sales</div><div>More</div></div></div></div><p class="cap">5 — Receipt: prints offline, reprint anytime</p></div>
+
+<div><div class="phone"><div class="screen"><div class="notch">9:41</div><div class="body">
+<div class="t">More</div>
+<div class="card"><b>Online sync</b><br><span class="pill orange">2 sale(s) on this phone only</span><br><span class="muted">Last sent: never yet</span><div style="height:8px"></div><div class="btn">Send now</div></div>
+<div class="card"><b>Who can do what</b><br>Owner: stock, prices, profit, voids.<br>Staff: POS sales + reprint only.</div>
+</div><div class="tabs"><div>POS</div><div>Stock</div><div>Sales</div><div class="on">More</div></div></div></div><p class="cap">6 — More: sync status + roles</p></div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tindahan POS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css?v=20261009-untagged-1">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app">
+  <div id="scrim" class="scrim hidden"></div>
+  <aside id="sidebar" class="sidebar" aria-label="Main modules">
+    <div class="side-head">
+      <div>
+        <div class="side-store">FREEREN POS</div>
+      </div>
+    </div>
+    <nav class="side-nav">
+      <button data-view="dash"><i data-lucide="bar-chart-3"></i><span>Dashboard</span></button>
+      <button data-view="pos"><i data-lucide="shopping-cart"></i><span>POS</span></button>
+      <button data-view="inv"><i data-lucide="package"></i><span>Stock</span></button>
+      <button data-view="shifts"><i data-lucide="wallet"></i><span>Shifts</span></button>
+      <button data-view="settings"><i data-lucide="settings"></i><span>Setup</span></button>
+    </nav>
+    <div class="side-foot">
+      <div id="sidebarAccount" class="sidebar-account">
+        <strong id="sidebarUserName">Owner</strong>
+        <span id="sidebarUserEmail"></span>
+      </div>
+      <button id="sidebarLogoutBtn" class="ghost sidebar-logout hidden" type="button">Logout</button>
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="till-head">
+      <button id="menuBtn" class="icon-btn menu-btn" aria-label="Open menu"><i data-lucide="menu"></i></button>
+    </header>
+    <main id="mainScroll">
+      <section id="view-login" class="card login-card">
+        <h2>Sign in to counter</h2>
+        <p class="mut">owner@demo / demo123 â€” full access. staff@demo / demo123 â€” POS only.</p>
+        <label class="lbl">Email<input id="email" value="owner@demo" autocomplete="username"></label>
+        <label class="lbl">Password<input id="password" type="password" value="demo123" autocomplete="current-password"></label>
+        <div class="row" style="margin-top:10px">
+          <button id="loginBtn" class="grow charge">Sign in</button>
+          <button id="logoutBtn" class="ghost">Sign out</button>
+        </div>
+        <p class="mut" id="authMsg"></p>
+      </section>
+
+      <section id="view-pos" class="hidden pos-wrap">
+        <div class="pos-heading-row">
+          <h2 class="pos-section-title">Add Order</h2>
+          <button id="cartIconBtn" class="cart-icon-btn" type="button" aria-label="Shopping cart">
+            <i data-lucide="shopping-cart" aria-hidden="true"></i>
+            <span id="cartCountBadge" class="cart-count-badge hidden" aria-hidden="true">0</span>
+          </button>
+        </div>
+        <div class="pos-catalog">
+          <div id="posCategories" class="pos-categories noprint" role="group" aria-label="Product categories"></div>
+          <div id="productList" class="tile-grid"></div>
+        </div>
+        <section class="pos-summary hidden" id="posSummary" aria-live="polite">
+          <div class="summary-copy">
+            <strong class="summary-value" id="summaryTotal">&#8369;0.00</strong>
+            <span class="summary-label" id="summaryOrderCount">0 items</span>
+          </div>
+          <button id="checkoutBtn" class="charge checkout-trigger" type="button">Review</button>
+        </section>
+        <div id="checkoutOverlay" class="checkout-overlay hidden">
+          <section class="checkout-sheet card docket" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+            <div class="sheet-grabber" id="sheetGrabber" role="button" tabindex="0" aria-expanded="false" aria-controls="cartList" aria-label="Expand or collapse order; drag up to see more products"></div>
+            <div class="checkout-head"><h2 id="checkoutTitle">Complete Order</h2><button id="checkoutExpandBtn" class="ghost checkout-expand" type="button">Clear all</button></div>
+            <div class="checkout-lines" id="cartList"><p class="mut">Tap a product to add it.</p></div>
+            <div class="sum-lines">
+              <div class="sum-line"><span>Subtotal</span><span id="subTotal">&#8369;0.00</span></div>
+              <div class="sum-line"><span>Discount</span><span id="discLabel">&#8722;&#8369;0.00</span></div>
+            </div>
+            <div class="total-row"><span>Total Peso</span><span class="total" id="cartTotal">&#8369;0.00</span></div>
+            <div class="cash-grid noprint">
+              <input id="cash" inputmode="decimal" aria-label="Cash amount" aria-describedby="cashFeedback">
+              <small id="cashFeedback" class="cash-feedback hidden" aria-live="polite"></small>
+              <div id="paySwipe" class="checkout-swipe">
+                <span class="checkout-swipe-fill" aria-hidden="true"></span>
+                <span class="checkout-swipe-label" aria-hidden="true">Swipe to confirm</span>
+                <span class="checkout-swipe-label checkout-swipe-label-filled" aria-hidden="true">Swipe to confirm</span>
+                <button id="payBtn" class="checkout-swipe-arrow" type="button" aria-label="Confirm order: swipe right, or press Enter">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="paymentMethodModal" class="inventory-modal hidden">
+              <section class="inventory-dialog card payment-method-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentMethodTitle">
+                <h2 id="paymentMethodTitle">Choose payment method</h2>
+                <p class="mut">Select how the customer paid.</p>
+                <div class="payment-method-actions">
+                  <button id="cashPaymentBtn" class="charge grow" type="button">Cash</button>
+                  <button id="onlinePaymentBtn" class="ghost grow" type="button">Online payment</button>
+                </div>
+                <button id="cancelPaymentMethodBtn" class="payment-cancel" type="button">Cancel</button>
+              </section>
+            </div>
+            <p class="change" id="changeLabel"></p>
+          </section>
+        </div>
+        <div id="cashSuccessOverlay" class="cash-success-overlay hidden noprint">
+          <section class="cash-success-card card" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
+            <div id="cashSuccessAnimation" class="cash-success-animation" aria-hidden="true"></div>
+            <svg id="cashSuccessFallback" class="cash-success-fallback" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="44" fill="#28594B"/><path d="m27 48 14 14 28-28" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h2>Transaction successful</h2>
+            <p id="cashSuccessChange"></p>
+          </section>
+        </div>
+        <div id="cartRemoveModal" class="inventory-modal hidden">
+          <section class="inventory-dialog card cart-remove-dialog" role="alertdialog" aria-modal="true" aria-labelledby="cartRemoveTitle" aria-describedby="cartRemoveDescription">
+            <h2 id="cartRemoveTitle">Remove item?</h2>
+            <p id="cartRemoveDescription" class="mut">Remove <strong id="cartRemoveProductName">this item</strong> from the current order?</p>
+            <div class="inventory-modal-actions">
+              <button id="cancelCartRemovalBtn" class="ghost grow" type="button">Keep item</button>
+              <button id="confirmCartRemovalBtn" class="danger grow" type="button">Remove item</button>
+            </div>
+          </section>
+        </div>        <div id="cashShortModal" class="cash-short-overlay hidden">
+          <section class="cash-short-dialog card" role="alertdialog" aria-modal="true" aria-labelledby="cashShortTitle" aria-describedby="cashShortMessage">
+            <h2 id="cashShortTitle">Insufficient cash</h2>
+            <p id="cashShortMessage" class="mut">The cash received is less than the total due.</p>
+            <div class="cash-short-actions">
+              <button id="addCashBtn" class="charge grow" type="button">Add cash</button>
+            </div>
+          </section>
+        </div>
+        <pre id="receiptText" class="print-receipt">&#8212;</pre>
+      </section>
+
+<section id="view-inv" class="hidden">
+        <div class="stock-page-head"><div><h2>Stock</h2><p class="mut hidden" id="stockSyncStatus">Inventory overview</p></div></div>
+        <div class="stock-tabs" role="tablist" aria-label="Stock sections">
+          <button class="stock-tab on" type="button" data-stock-tab="overview" role="tab" aria-selected="true">Overview</button>
+          <button class="stock-tab" type="button" data-stock-tab="products" role="tab" aria-selected="false">Products</button>
+          <button class="stock-tab" type="button" data-stock-tab="history" role="tab" aria-selected="false">History</button>
+        </div>
+        <section id="stockOverviewPanel" class="stock-panel" role="tabpanel">
+          <div class="stock-kpis">
+            <article class="stock-kpi"><span>Products</span><b id="stockProductCount">0</b><small>Active items</small></article>
+            <article class="stock-kpi"><span>Stock alerts</span><b><span id="stockLowCount">0</span><small> low</small></b><small><span id="stockOutCount">0</span> out of stock</small></article>
+            <article class="stock-kpi"><span>Stock value</span><b id="stockValue">â‚±0.00</b><small>At cost</small></article>
+            <article class="stock-kpi"><span>Units moved</span><b><span id="stockSoldUnits">0</span> / <span id="stockReceivedUnits">0</span></b><small>Sold / restocked</small></article>
+          </div>
+          
+          <section class="card stock-movement-card">
+            <div class="stock-card-heading"><b>Recent stock activity</b><label class="stock-period-label" for="stockPeriod">Period<select id="stockPeriod"><option value="7">Last 7 days</option><option value="today">Today</option><option value="30">Last 30 days</option></select></label></div>
+            <div id="stockRecentMovements" class="stock-movement-list"></div>
+          </section>
+        </section>
+        <div id="stockProductsPanel" class="stock-panel hidden" role="tabpanel">
+        <div class="stock-product-actions">
+          <button id="addProductBtn" class="charge add-product-trigger" type="button">Add product</button>
+          <button id="adjustStockBtn" class="ghost" type="button">Adjust stock</button>
+          <label class="stock-status-filter" for="stockStatusFilter">Stock status
+            <select id="stockStatusFilter">
+              <option value="all">All stock</option>
+              <option value="high">High stock</option>
+              <option value="medium">Medium stock</option>
+              <option value="low">Low stock</option>
+              <option value="out">Out of stock</option>
+            </select>
+          </label>
+        </div>
+        <div id="invList" class="inventory-list"></div>
+        </div>
+        <div id="invModal" class="inventory-modal hidden">
+          <section class="inventory-dialog card" role="dialog" aria-modal="true" aria-labelledby="invModalTitle">
+            <div class="inventory-modal-head">
+              <h2 id="invModalTitle">Add product</h2>
+            </div>
+            <div class="grid2">
+              <label class="lbl">Product name<input id="pName" placeholder="e.g. Kopiko"></label>
+              <label class="lbl">SKU / barcode<input id="pSku" placeholder="Optional"></label>
+              <div class="lbl category-picker">
+                <label for="pCategory">Category</label>
+                <div class="category-input-row">
+                  <input id="pCategory" placeholder="Select or type a category" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="productCategoryOptions">
+                  <button id="categoryToggle" class="category-toggle" type="button" aria-label="Show categories" aria-expanded="false" aria-controls="productCategoryDropdown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+                </div>
+                <div id="productCategoryDropdown" class="category-dropdown hidden">
+                  <div id="productCategoryOptions" role="listbox" aria-label="Available categories"></div>
+                  <button id="addCategoryBtn" class="category-add hidden" type="button"></button>
+                </div>
+                <small id="pCategoryFeedback" class="mut category-help" aria-live="polite"></small>
+              </div>
+              <label class="lbl">Price<input id="pPrice" inputmode="decimal" placeholder="0.00"></label>
+              <label class="lbl">Cost<input id="pCost" inputmode="decimal" placeholder="0.00"></label>
+              <label class="lbl">Stock quantity<input id="pStock" inputmode="numeric" placeholder="0"></label>
+              <label class="lbl">Restock alert at<input id="pReorder" inputmode="numeric" min="0" placeholder="5"></label>
+            </div>
+
+            <div class="inventory-modal-actions">
+              <button id="cancelProductBtn" class="ghost grow" type="button">Cancel</button>
+              <button id="pSave" class="charge grow" type="button">Save</button>
+            </div>
+          </section>
+        </div>
+        </div>
+        <div id="categoryEditorModal" class="inventory-modal category-editor-modal hidden">
+          <section class="inventory-dialog card category-editor-dialog" role="dialog" aria-modal="true" aria-labelledby="categoryEditorTitle">
+            <h2 id="categoryEditorTitle">Edit category</h2>
+            <label class="lbl" for="categoryEditName">Name<input id="categoryEditName" autocomplete="off" maxlength="80"></label>
+            <label class="lbl" for="categoryEditColor">Color<input id="categoryEditColor" type="color" value="#28594b"></label>
+            <span id="categoryEditPreview" class="category-edit-preview" aria-hidden="true"></span>
+            <p id="categoryEditError" class="category-edit-error hidden" role="alert"></p>
+            <div class="inventory-modal-actions"><button id="categoryEditCancel" class="ghost grow" type="button">Cancel</button><button id="categoryEditSave" class="charge grow" type="button">Save</button></div>
+          </section>
+        </div>
+        <section id="stockHistoryPanel" class="stock-panel hidden" role="tabpanel">
+          <div class="card stock-history-card"><div class="stock-card-heading"><b>Stock history</b><span class="mut small">Latest first</span></div><div id="stockMovementHistory" class="stock-movement-list"></div></div>
+        </section>
+        <div id="stockMovementModal" class="inventory-modal hidden">
+          <section class="inventory-dialog card stock-movement-dialog" role="dialog" aria-modal="true" aria-labelledby="stockMovementTitle">
+            <h2 id="stockMovementTitle">Restock product</h2>
+            <label class="lbl" for="stockMovementProduct">Product<select id="stockMovementProduct"></select></label>
+            <label class="lbl" for="stockMovementQty">Quantity<input id="stockMovementQty" type="number" inputmode="numeric" step="1" min="1" placeholder="Enter quantity"></label>
+            
+            <p id="stockMovementError" class="stock-error hidden" role="alert"></p>
+            <div class="inventory-modal-actions">
+              <button id="cancelStockMovementBtn" class="ghost grow" type="button">Cancel</button>
+              <button id="saveStockMovementBtn" class="charge grow" type="button">Save</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <div id="voidReasonModal" class="inventory-modal hidden">
+        <section class="inventory-dialog card void-dialog" role="dialog" aria-modal="true" aria-labelledby="voidReasonTitle" aria-describedby="voidReasonHelp">
+          <h2 id="voidReasonTitle">Why are you voiding this sale?</h2>
+          <p id="voidReasonHelp" class="mut">Enter a reason before continuing.</p>
+          <label class="lbl" for="voidReasonInput">Reason</label>
+          <textarea id="voidReasonInput" rows="3" maxlength="240" placeholder="e.g. Wrong item or duplicate sale"></textarea>
+          <p id="voidReasonError" class="void-error hidden" role="alert">Enter a reason to continue.</p>
+          <div class="inventory-modal-actions">
+            <button id="cancelVoidReasonBtn" class="ghost grow" type="button">Cancel</button>
+            <button id="continueVoidBtn" class="charge grow" type="button">Continue</button>
+          </div>
+        </section>
+      </div>
+      <div id="confirmVoidModal" class="inventory-modal hidden">
+        <section class="inventory-dialog card void-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmVoidTitle" aria-describedby="confirmVoidDescription">
+          <h2 id="confirmVoidTitle">Are you sure?</h2>
+          <p id="confirmVoidDescription" class="mut">This sale will be voided and its stock returned.</p>
+          <p class="void-reason-preview"><b>Reason:</b> <span id="confirmVoidReason"></span></p>
+          <div class="inventory-modal-actions">
+            <button id="cancelVoidConfirmBtn" class="ghost grow" type="button">Go back</button>
+            <button id="confirmVoidBtn" class="danger grow" type="button">Void sale</button>
+          </div>
+        </section>
+      </div>
+      <div id="deleteProductModal" class="inventory-modal hidden">
+        <section class="inventory-dialog card" role="alertdialog" aria-modal="true" aria-labelledby="deleteProductTitle" aria-describedby="deleteProductPrompt">
+          <h2 id="deleteProductTitle">Delete product?</h2>
+          <p class="mut" id="deleteProductPrompt">Type <strong id="deleteProductName"></strong> to confirm deletion.</p>
+          <input id="deleteConfirmInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter product name">
+          <div class="inventory-modal-actions">
+            <button id="cancelDeleteBtn" class="ghost grow" type="button">Cancel</button>
+            <button id="confirmDeleteBtn" class="danger grow" type="button" disabled>Delete product</button>
+          </div>
+        </section>
+      </div>
+      <section id="view-dash" class="hidden">
+        
+        <div class="kpi dashboard-kpis">
+          <div class="kpi-today-sales"><div class="mut small">TODAY SALES</div><b id="kSales">₱0</b><span id="todaySalesChange" class="kpi-comparison is-flat" aria-live="polite">Compared with yesterday</span></div><div><div class="mut small">TODAY PROFIT</div><b id="kProfit">₱0</b></div>
+          <div><div class="mut small">AVERAGE ORDER</div><b id="kAverage">₱0</b></div>
+        </div>
+        <section class="card dash-chart-card"><div class="dash-card-heading"><div><b>Sales trend</b><p class="mut">Daily net sales · current week vs previous week</p></div></div>
+          <div class="chart-legend"><span><i class="legend-current"></i>This week</span><span><i class="legend-previous"></i>Previous week</span></div>
+          <div id="weeklySalesChart" class="weekly-sales-chart" role="list" aria-label="Daily sales compared with previous week"></div><p id="chartTooltip" class="chart-tooltip hidden" role="status" aria-live="polite"></p><div id="weeklySalesSummary" class="weekly-sales-summary" aria-live="polite"><span id="weeklyCurrentSummary"></span><span class="weekly-previous-group"><span id="weeklyPreviousSummary"></span><span id="weeklyComparison"></span></span></div>
+        </section>
+        <div class="dashboard-panels">
+          <section class="card"><div class="dash-card-heading"><b>Best sellers</b><span class="mut small">LAST 7 DAYS</span></div><div id="bestSellerList"></div></section>
+          <section class="card"><div class="dash-card-heading"><b>Restock alerts</b><button id="manageStockBtn" class="ghost dashboard-link" type="button">Manage</button></div><div id="restockList"></div></section>
+          <section class="card shift-snapshot-card"><div class="dash-card-heading"><b>Current shift</b></div><div id="shiftSnapshot"></div></section>
+        </div>
+        <section class="card recent-sales-card"><b>Recent sales</b><p class="mut">Owner can void a wrong sale. Stock goes back, sale stays in log.</p><div id="saleList"></div></section><p id="dashError" class="mut dashboard-error hidden" role="status"></p>
+      </section>
+
+      <section id="view-shifts" class="hidden">
+        <div class="card">
+          <b>Cash shift</b>
+          <p class="mut">Open with starting cash. Close with counted cash. App shows expected vs actual.</p>
+          <div id="shiftInfo"></div>
+          <div class="grid2" style="margin-top:8px">
+            <input id="shiftOpen" inputmode="decimal" placeholder="Opening cash (e.g. 500)">
+            <button id="shiftOpenBtn" class="charge">Open shift</button>
+            <input id="shiftClose" inputmode="decimal" placeholder="Counted cash">
+            <button id="shiftCloseBtn" class="ghost">Close shift</button>
+          </div>
+          <p class="mut" id="shiftMsg"></p>
+        </div>
+        <div class="card"><b>Past shifts</b><div id="shiftList"></div></div>
+      </section>
+
+      <section id="view-settings" class="hidden">
+        <div class="card">
+          <b>Online (Supabase)</b>
+          <p class="mut">Paste keys to go online. Empty = offline demo on this device.</p>
+          <input id="sbUrl" placeholder="https://your-project.supabase.co">
+          <input id="sbKey" placeholder="anon key" style="margin-top:8px">
+          <div class="row" style="margin-top:8px">
+            <button id="sbSave" class="grow charge">Save + reconnect</button>
+            <button id="exportBtn" class="ghost">CSV</button>
+          </div>
+          <p class="mut" id="sbMsg"></p>
+        </div>
+        <div class="card"><b>How it works</b>
+          <p class="mut">Sell offline any time. Each sale saves stock + receipt at once, then sends to Supabase when internet returns. Run supabase/schema.sql once in your Supabase SQL editor.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<script defer src="./assets/lottie_light.min.js?v=5.13.0"></script>
+<script type="module" src="./app.js?v=20261009-untagged-1"></script>
+<script defer src="./agentation.bundle.js?v=2"></script>
+</body>
+</html>
+

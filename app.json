@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Inventory POS",
+    "slug": "inventory-pos-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "inventorypos",
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-asset",
+      "expo-secure-store"
+    ],
+    "android": {
+      "package": "com.store.inventorypos",
+      "permissions": [
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH_SCAN"
+      ]
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "7f61762d-3179-4499-869f-0ec63937cc5e"
+      }
+    }
+  }
+}
